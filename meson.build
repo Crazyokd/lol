@@ -65,3 +65,15 @@ if muon.found()
     )
     # so how muon analyze?
 endif
+
+clangformat = find_program('clang-format', required: false)
+if clangformat.found()
+    run_target(
+        'format',
+        command: [
+            'format.sh',
+            meson.version().version_compare('>= 0.55.0') ? clangformat.full_path() : clangformat.path(),
+            meson.current_source_dir(),
+        ],
+    )
+endif
