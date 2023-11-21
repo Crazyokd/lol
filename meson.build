@@ -52,6 +52,16 @@ executable(
     install: true,
 )
 
-# try muon
-# muon analyze
-# muon fmt
+muon = find_program('muon', required: false) # https://github.com/annacrombie/muon
+if muon.found()
+    run_target(
+        'muon-fmt',
+        command: [
+            'muon',
+            'fmt',
+            '-i', join_paths(meson.current_source_dir(), 'meson.build'),
+            join_paths(meson.current_source_dir(), 'src', 'meson.build'),
+        ],
+    )
+    # so how muon analyze?
+endif
