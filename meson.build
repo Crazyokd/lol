@@ -2,9 +2,7 @@ project('lol', ['c'], version: '0.0.1', meson_version: '>= 0.56.0')
 
 cc = meson.get_compiler('c')
 
-prefix = (
-    run_command('sh', '-c', 'echo $PWD', check: false).stdout().strip() / 'install'
-)
+prefix = get_option('prefix')
 
 bindir = join_paths(prefix, get_option('bindir'))
 libdir = join_paths(prefix, get_option('libdir'))

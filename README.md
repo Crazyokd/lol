@@ -3,7 +3,7 @@ named Log fOr Log.
 
 # Usage
 ```shell
-meson setup build
+meson setup --prefix=`pwd`/install build
 meson install -C build && ./install/bin/lol-example
 
 # format meson.build
