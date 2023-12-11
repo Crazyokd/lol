@@ -1,0 +1,10 @@
+format:
+
+output:
+  file:
+    enable: true
+    level: INFO
+    location: @localstatedir@/log/lol.log
+  stdout:
+    enable: true
+    level: DEBUG

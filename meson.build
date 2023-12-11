@@ -6,6 +6,12 @@ prefix = get_option('prefix')
 
 bindir = join_paths(prefix, get_option('bindir'))
 libdir = join_paths(prefix, get_option('libdir'))
+sysconfdir = join_paths(prefix, get_option('sysconfdir'))
+
+python3_exe = join_paths(find_program('python3', 'python').path())
+mkdir_p = 'import os; os.makedirs("@0@", exist_ok=True) if not os.environ.get("DESTDIR") else False;'
+install_conf = 'import os; import shutil; shutil.copy("@0@", "@1@") if not os.environ.get("DESTDIR") and not os.path.isfile(os.path.join("@1@", os.path.split("@0@")[1])) else False;'
+
 
 comm_inc = include_directories(
     '''
@@ -13,7 +19,7 @@ comm_inc = include_directories(
 '''.split(),
 )
 
-
+subdir('configs')
 subdir('src')
 
 message(
@@ -43,6 +49,7 @@ message(
 executable(
     'lol-example',
     'example.c',
+    c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/lol.yaml"'.format(lol_sysconfdir),
     include_directories: [comm_inc],
     link_with: [lol],
     install_rpath: libdir,

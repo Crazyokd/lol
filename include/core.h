@@ -10,6 +10,30 @@
 extern "C" {
 #endif
 
+typedef enum {
+    LOL_LOG_NONE = 0,
+    LOL_LOG_FATAL,
+    LOL_LOG_ERROR,
+    LOL_LOG_WARN,
+    LOL_LOG_INFO,
+    LOL_LOG_DEBUG,
+    LOL_LOG_TRACE,
+    LOL_LOG_DEFAULT = LOL_LOG_INFO,
+    LOL_LOG_FULL = LOL_LOG_TRACE,
+} lol_log_level_e;
+
+lol_log_level_e lol_log_level_string_to_enum(const char *level);
+
+typedef struct lol_context_s {
+    void *document;
+    const char *config_file;
+
+    int file_enable;
+    lol_log_level_e file_level;
+    const char *file_location;
+    int stdout_enable;
+    lol_log_level_e stdotu_level;
+} lol_context_t;
 
 /* add compile check for printf */
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)

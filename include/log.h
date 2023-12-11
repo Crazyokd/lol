@@ -10,18 +10,7 @@ extern "C" {
 #endif
 
 
-typedef enum {
-    LOL_LOG_NONE = 0,
-    LOL_LOG_FATAL,
-    LOL_LOG_ERROR,
-    LOL_LOG_WARN,
-    LOL_LOG_INFO,
-    LOL_LOG_DEBUG,
-    LOL_LOG_TRACE,
-    LOL_LOG_DEFAULT = LOL_LOG_INFO,
-    LOL_LOG_FULL = LOL_LOG_TRACE,
-} lol_log_level_e;
-
+void lol_init(const char* file);
 
 void lol_log_vprintf(lol_log_level_e level, int domain_id,
     int err, const char *file, int line, const char *func,

@@ -1,6 +1,7 @@
 #include "log.h"
 #include "time.h"
 #include "sys/time.h"
+#include "parser.h"
 
 list_t log_list = { NULL, NULL };
 
@@ -184,4 +185,18 @@ void lol_log_printf(lol_log_level_e level, int domain_id,
     lol_log_vprintf(level, domain_id,
             err, file, line, func, content_only, format, args);
     va_end(args);
+}
+
+
+void lol_init(const char* file) {
+    read_yaml_config(file);
+    parse_yaml_config();
+}
+
+void __attribute__((constructor)) my_constructor(void) {
+    printf("Initialization work\n");
+}
+
+void __attribute__((destructor)) my_destructor(void) {
+    printf("Cleanup work\n");
 }
