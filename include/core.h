@@ -2,6 +2,7 @@
 #define LOL_CORE_H_
 
 #include "core-config.h"
+#include "compiler-opt.h"
 #include "color.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -9,6 +10,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define likely(expr) __builtin_expect(!!(expr), 1)
+#define unlikely(expr) __builtin_expect(!!(expr), 0)
 
 typedef enum {
     LOL_LOG_NONE = 0,
