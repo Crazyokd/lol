@@ -3,7 +3,6 @@ named Log fOr Log.
 
 # Usage
 ```shell
-sudo apt install libyaml-dev
 meson setup --prefix=`pwd`/install build
 meson install -C build && ./install/bin/lol-example
 
@@ -13,6 +12,3 @@ meson compile muon-fmt -C build
 meson compile format -C build
 ```
 
-# TODO
-- [ ] add `abort` function.
-- [x] configurable

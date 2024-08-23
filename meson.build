@@ -6,21 +6,24 @@ prefix = get_option('prefix')
 
 bindir = join_paths(prefix, get_option('bindir'))
 libdir = join_paths(prefix, get_option('libdir'))
-sysconfdir = join_paths(prefix, get_option('sysconfdir'))
 
-python3_exe = join_paths(find_program('python3', 'python').path())
-mkdir_p = 'import os; os.makedirs("@0@", exist_ok=True) if not os.environ.get("DESTDIR") else False;'
-install_conf = 'import os; import shutil; shutil.copy("@0@", "@1@") if not os.environ.get("DESTDIR") and not os.path.isfile(os.path.join("@1@", os.path.split("@0@")[1])) else False;'
+lol_sources = [
+    'lol.c',
+]
 
-
-comm_inc = include_directories(
-    '''
-  include
-'''.split(),
+lol_lib = library(
+    'lol',
+    lol_sources,
+    include_directories: ['.'],
+    install_dir: libdir,
+    install: true,
 )
 
-subdir('configs')
-subdir('src')
+# for extern use
+lol_dep = declare_dependency(
+    link_with : lol_lib,
+    include_directories : ['.'],
+)
 
 message(
     '\n'.join(
@@ -49,9 +52,8 @@ message(
 executable(
     'lol-example',
     'example.c',
-    c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/lol.yaml"'.format(lol_sysconfdir),
-    include_directories: [comm_inc],
-    link_with: [lol],
+    include_directories: ['.'],
+    dependencies: [lol_dep],
     install_rpath: libdir,
     install_dir: bindir,
     install: true,
