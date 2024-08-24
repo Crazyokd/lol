@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-    printf("argc=%d\n", argc);
     if (argc == 1) {
         lol_init2();
     } else if (argc == 2) {
