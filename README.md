@@ -1,7 +1,7 @@
 # LOL
 named Log fOr Log.
 
-# Usage
+# Compile
 ```shell
 meson setup --prefix=`pwd`/install build
 meson install -C build && ./install/bin/lol-example
@@ -12,3 +12,24 @@ meson compile muon-fmt -C build
 meson compile format -C build
 ```
 
+# Usage
+```shell
+lol_init2();
+
+lol_fatal("fatal");
+lol_error("error");
+lol_warn("warn");
+lol_info("info");
+lol_debug("debug");
+lol_trace("trace");
+
+lol_add_domain("test", LOL_INFO, NULL, LOL_NONE);
+lol_fatal2("test", "fatal");
+lol_error2("test", "error");
+lol_warn2("test", "warn");
+lol_info2("test", "info");
+lol_debug2("test", "debug");
+lol_trace2("test", "trace");
+
+lol_fini();
+```
