@@ -18,6 +18,22 @@ int main(int argc, char **argv) {
     lol_debug("debug");
     lol_trace("trace");
 
+    /* test multiple domain */
+    lol_fatal2("no-domain", "fatal");
+    lol_error2("no-domain", "error");
+    lol_warn2("no-domain", "warn");
+    lol_info2("no-domain", "info");
+    lol_debug2("no-domain", "debug");
+    lol_trace2("no-domain", "trace");
+
+    lol_add_domain("test", LOL_INFO, NULL, LOL_NONE);
+    lol_fatal2("test", "fatal");
+    lol_error2("test", "error");
+    lol_warn2("test", "warn");
+    lol_info2("test", "info");
+    lol_debug2("test", "debug");
+    lol_trace2("test", "trace");
+
     lol_fini();
     return 0;
 }

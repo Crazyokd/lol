@@ -301,3 +301,49 @@ void lol_fini()
         prev = log;
     }
 }
+
+
+int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
+                    lol_level_e file_level)
+{
+    if (!lol_list || !domain || !strlen(domain))
+        return -1;
+
+    lol_t *log, *next;
+    /* init log_list */
+    log = calloc(1, sizeof(lol_t));
+    if (!log) {
+        return -1;
+    }
+
+    /* set log domain and level */
+    log->domain = malloc(strlen(domain)+1);
+    if (!log->domain) {
+        free(log);
+        return -1;
+    }
+    strcpy(log->domain, domain);
+    log->print.domain = 1;
+    log->level = std_level;
+
+    /* add default writer */
+    log->out = stderr;
+    log->writer = file_writer;
+
+    /* add default properties */
+#if !defined(_WIN32)
+    log->print.color = 1;
+#endif
+    log->print.timestamp = 1;
+    log->print.level = 1;
+    log->print.fileline = 1;
+    log->print.function = 1;
+    log->print.linefeed = 1;
+
+    /* add log to the tail of lol_list */
+    next = lol_list;
+    while (next->next) next = next->next;
+    next->next = log;
+
+    return 0;
+}
