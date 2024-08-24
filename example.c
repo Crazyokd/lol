@@ -1,7 +1,17 @@
 #include "lol.h"
 
-int main() {
-    lol_init2();
+#include <stdlib.h>
+
+int main(int argc, char **argv) {
+    printf("argc=%d\n", argc);
+    if (argc == 1) {
+        lol_init2();
+    } else if (argc == 2) {
+        lol_init(NULL, atoi(argv[1]), NULL, LOL_NONE);
+    } else {
+        lol_init(argv[1], atoi(argv[2]), NULL, LOL_NONE);
+    }
+
     lol_fatal("fatal");
     lol_error("error");
     lol_warn("warn");

@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-lol_t *lol_log_list = NULL;
+lol_t *lol_list = NULL;
+
+static const char *g_lol_domain = NULL;
 
 static void file_writer(lol_t *log, lol_level_e level, const char *string)
 {
@@ -141,9 +143,18 @@ void lol_vprintf(lol_level_e level, const char *domain_name,
     char logstr[LOL_MAX_LEN];
     char *p, *last;
 
+    if (!domain_name) {
+        domain_name = g_lol_domain;
+    }
+
     /* 遍历所有domain */
-    for (log = lol_log_list; log; log = log->next) {
+    for (log = lol_list; log; log = log->next) {
         /* 通过domain_name匹配目标lol_t */
+        if (log->domain && domain_name && strcmp(log->domain, domain_name))
+            continue;
+        if ((!log->domain || !domain_name) && log->domain != domain_name)
+            continue;
+
         if (log->level < level)
             return;
 
@@ -198,37 +209,41 @@ void lol_printf(lol_level_e level, const char *domain_id,
 int lol_init(const char *domain, lol_level_e std_level, const char *file,
              lol_level_e file_level)
 {
+    /* the lol only can be initialized once */
+    if (lol_list) return -1;
+
     /* init log_list */
-    lol_log_list = calloc(1, sizeof(lol_t));
-    if (!lol_log_list) {
+    lol_list = calloc(1, sizeof(lol_t));
+    if (!lol_list) {
         return -1;
     }
 
     /* set log domain and level */
     if (domain && strlen(domain)) {
-        lol_log_list->domain = malloc(strlen(domain)+1);
-        if (!lol_log_list->domain) {
-            free(lol_log_list);
+        lol_list->domain = malloc(strlen(domain)+1);
+        if (!lol_list->domain) {
+            free(lol_list);
             return -1;
         }
-        strcpy(lol_log_list->domain, domain);
-        lol_log_list->print.domain = 1;
+        strcpy(lol_list->domain, domain);
+        lol_list->print.domain = 1;
     }
-    lol_log_list->level = std_level;
+    g_lol_domain = domain;
+    lol_list->level = std_level;
 
     /* add default writer */
-    lol_log_list->out = stderr;
-    lol_log_list->writer = file_writer;
+    lol_list->out = stderr;
+    lol_list->writer = file_writer;
 
     /* add default properties */
 #if !defined(_WIN32)
-    lol_log_list->print.color = 1;
+    lol_list->print.color = 1;
 #endif
-    lol_log_list->print.timestamp = 1;
-    lol_log_list->print.level = 1;
-    lol_log_list->print.fileline = 1;
-    lol_log_list->print.function = 1;
-    lol_log_list->print.linefeed = 1;
+    lol_list->print.timestamp = 1;
+    lol_list->print.level = 1;
+    lol_list->print.fileline = 1;
+    lol_list->print.function = 1;
+    lol_list->print.linefeed = 1;
 
     return 0;
 }
@@ -242,7 +257,7 @@ void lol_fini()
 {
     lol_t *log = NULL;
     lol_t *prev = NULL;
-    for (log = lol_log_list; log; log = log->next, free(prev)) {
+    for (log = lol_list; log; log = log->next, free(prev)) {
         if (log->print.domain) {
             free(log->domain);
         }
