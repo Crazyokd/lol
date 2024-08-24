@@ -44,7 +44,10 @@ typedef struct lol_s {
   struct lol_s *next;
 } lol_t;
 
-static lol_t *lol_list = NULL;
+static struct {
+    lol_t *head;
+    lol_t *tail;
+} lol_list = {0, 0};
 
 static const char *g_lol_domain = NULL;
 
@@ -185,7 +188,7 @@ static void lol_vprintf(lol_level_e level, const char *domain_name,
     }
 
     /* 遍历所有domain */
-    for (log = lol_list; log; log = log->next) {
+    for (log = lol_list.head; log; log = log->next) {
         /* 通过domain_name匹配目标lol_t */
         if (log->domain && domain_name && strcmp(log->domain, domain_name))
             continue;
@@ -247,41 +250,44 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
              lol_level_e file_level)
 {
     /* the lol only can be initialized once */
-    if (lol_list) return -1;
+    if (lol_list.head) return -1;
+
+    lol_t *log;
 
     /* init log_list */
-    lol_list = calloc(1, sizeof(lol_t));
-    if (!lol_list) {
+    log = calloc(1, sizeof(lol_t));
+    if (!log) {
         return -1;
     }
 
     /* set log domain and level */
     if (domain && strlen(domain)) {
-        lol_list->domain = malloc(strlen(domain)+1);
-        if (!lol_list->domain) {
-            free(lol_list);
+        log->domain = malloc(strlen(domain)+1);
+        if (!log->domain) {
+            free(log);
             return -1;
         }
-        strcpy(lol_list->domain, domain);
-        lol_list->print.domain = 1;
+        strcpy(log->domain, domain);
+        log->print.domain = 1;
     }
     g_lol_domain = domain;
-    lol_list->level = std_level;
+    log->level = std_level;
 
     /* add default writer */
-    lol_list->out = stderr;
-    lol_list->writer = file_writer;
+    log->out = stderr;
+    log->writer = file_writer;
 
     /* add default properties */
 #if !defined(_WIN32)
-    lol_list->print.color = 1;
+    log->print.color = 1;
 #endif
-    lol_list->print.timestamp = 1;
-    lol_list->print.level = 1;
-    lol_list->print.fileline = 1;
-    lol_list->print.function = 1;
-    lol_list->print.linefeed = 1;
+    log->print.timestamp = 1;
+    log->print.level = 1;
+    log->print.fileline = 1;
+    log->print.function = 1;
+    log->print.linefeed = 1;
 
+    lol_list.head = lol_list.tail = log;
     return 0;
 }
 
@@ -294,7 +300,7 @@ void lol_fini()
 {
     lol_t *log = NULL;
     lol_t *prev = NULL;
-    for (log = lol_list; log; log = log->next, free(prev)) {
+    for (log = lol_list.head; log; log = log->next, free(prev)) {
         if (log->print.domain) {
             free(log->domain);
         }
@@ -306,10 +312,10 @@ void lol_fini()
 int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
                     lol_level_e file_level)
 {
-    if (!lol_list || !domain || !strlen(domain))
+    if (!lol_list.head || !domain || !strlen(domain))
         return -1;
 
-    lol_t *log, *next;
+    lol_t *log;
     /* init log_list */
     log = calloc(1, sizeof(lol_t));
     if (!log) {
@@ -341,9 +347,8 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     log->print.linefeed = 1;
 
     /* add log to the tail of lol_list */
-    next = lol_list;
-    while (next->next) next = next->next;
-    next->next = log;
+    lol_list.tail->next = log;
+    lol_list.tail = log;
 
     return 0;
 }
