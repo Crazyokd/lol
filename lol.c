@@ -44,7 +44,7 @@ typedef struct lol_s {
   struct lol_s *next;
 } lol_t;
 
-lol_t *lol_list = NULL;
+static lol_t *lol_list = NULL;
 
 static const char *g_lol_domain = NULL;
 
@@ -55,7 +55,7 @@ static void file_writer(lol_t *log, lol_level_e level, const char *string)
 }
 
 /* the size parameter include trailing '\0' */
-int lol_vsnprintf(char *str, size_t size, const char *format, va_list ap)
+static int lol_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
     int r = -1;
     r = vsnprintf(str, size, format, ap);
@@ -64,7 +64,7 @@ int lol_vsnprintf(char *str, size_t size, const char *format, va_list ap)
     return r;
 }
 
-char *lol_vslprintf(char *str, char *last, const char *format, va_list ap)
+static char *lol_vslprintf(char *str, char *last, const char *format, va_list ap)
 {
     int r = -1;
 
@@ -77,7 +77,7 @@ char *lol_vslprintf(char *str, char *last, const char *format, va_list ap)
     return (str + r);
 }
 
-char *lol_slprintf(char *str, char *last, const char *format, ...)
+static char *lol_slprintf(char *str, char *last, const char *format, ...)
 {
     char *res;
     va_list ap;
@@ -142,7 +142,7 @@ static char *log_domain(char *buf, char *last,
     return buf;
 }
 
-const char *level_strings[] = {
+static const char *level_strings[] = {
     NULL,
     "FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE",
 };
@@ -172,7 +172,7 @@ static char *log_linefeed(char *buf, char *last)
     return lol_slprintf(buf, last, "\n");
 }
 
-void lol_vprintf(lol_level_e level, const char *domain_name,
+static void lol_vprintf(lol_level_e level, const char *domain_name,
     int err, const char *file, int line, const char *func,
     int content_only, const char *format, va_list ap)
 {
