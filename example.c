@@ -17,5 +17,7 @@ int main(int argc, char **argv) {
     lol_info("info");
     lol_debug("debug");
     lol_trace("trace");
+
+    lol_fini();
     return 0;
 }
