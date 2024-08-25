@@ -2,6 +2,10 @@ project('lol', ['c'], version: '0.0.1', meson_version: '>= 0.56.0')
 
 cc = meson.get_compiler('c')
 
+# Enable AddressSanitizer
+add_global_arguments('-fsanitize=address', language : 'c')
+add_global_link_arguments('-fsanitize=address', language : 'c')
+
 prefix = get_option('prefix')
 
 bindir = join_paths(prefix, get_option('bindir'))
