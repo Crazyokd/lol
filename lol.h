@@ -36,6 +36,9 @@ void lol_fini();
 int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
                     lol_level_e file_level);
 
+lol_level_e lol_string_to_level(const char *level);
+
+
 void lol_printf(lol_level_e level, const char *domain_id,
     int err, const char *file, int line, const char *func,
     int content_only, const char *format, ...);

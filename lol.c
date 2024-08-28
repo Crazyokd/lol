@@ -352,3 +352,25 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
 
     return 0;
 }
+
+lol_level_e lol_string_to_level(const char *level) {
+    if (!level) return LOL_NONE;
+
+    lol_level_e level_e;
+    if (!strcasecmp(level, "FATAL")) {
+        level_e = LOL_FATAL;
+    } else if (!strcasecmp(level, "ERROR")) {
+        level_e = LOL_ERROR;
+    } else if (!strcasecmp(level, "WARN")) {
+        level_e = LOL_WARN;
+    } else if (!strcasecmp(level, "INFO")) {
+        level_e = LOL_INFO;
+    } else if (!strcasecmp(level, "DEBUG")) {
+        level_e = LOL_DEBUG;
+    } else if (!strcasecmp(level, "TRACE")) {
+        level_e = LOL_TRACE;
+    } else {
+        level_e = LOL_INFO;
+    }
+    return level_e;
+}
