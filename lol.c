@@ -311,6 +311,19 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
         return -1;
 
     lol_t *log, *next;
+
+    next = lol_list;
+    do {
+        if (next->domain && !strcmp(next->domain, domain)) {
+            /* do not add same domain */
+            return -1;
+        }
+        if (next->next)
+            next = next->next;
+        else
+            break;
+    } while (1);
+
     /* init log_list */
     log = calloc(1, sizeof(lol_t));
     if (!log) {
@@ -342,7 +355,6 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     log->print.linefeed = 1;
 
     /* add log to the tail of lol_list */
-    next = lol_list;
     while (next->next) next = next->next;
     next->next = log;
 

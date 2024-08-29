@@ -34,6 +34,16 @@ int main(int argc, char **argv) {
     lol_debug2("test", "debug");
     lol_trace2("test", "trace");
 
+    int ret = lol_add_domain("test", LOL_ERROR, NULL, LOL_NONE);
+    if (ret != 0) {
+        lol_warn("failed to add domain");
+    }
+    lol_fatal2("test", "fatal");
+    lol_error2("test", "error");
+    lol_warn2("test", "warn");
+    lol_info2("test", "info");
+    lol_debug2("test", "debug");
+    lol_trace2("test", "trace");
     lol_fini();
     return 0;
 }
