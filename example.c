@@ -10,6 +10,10 @@ int main(int argc, char **argv) {
     } else {
         lol_init(argv[1], atoi(argv[2]), NULL, LOL_NONE);
     }
+    /* we support multiple call init */
+    lol_init2();
+    lol_init(NULL, 3, NULL, LOL_NONE);
+    lol_init("repeat", 4, NULL, LOL_NONE);
 
     lol_fatal("fatal");
     lol_error("error");
@@ -44,6 +48,10 @@ int main(int argc, char **argv) {
     lol_info2("test", "info");
     lol_debug2("test", "debug");
     lol_trace2("test", "trace");
+
+    /* we support multiple call fini */
+    lol_fini();
+    lol_fini();
     lol_fini();
     return 0;
 }

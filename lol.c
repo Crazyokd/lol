@@ -247,7 +247,8 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
              lol_level_e file_level)
 {
     /* the lol only can be initialized once */
-    if (lol_list) return -1;
+    if (lol_list)
+        return lol_add_domain(domain, std_level, file, file_level);
 
     /* init log_list */
     lol_list = calloc(1, sizeof(lol_t));
@@ -292,6 +293,8 @@ int lol_init2()
 
 void lol_fini()
 {
+    if (!lol_list) return;
+
     lol_t *log = NULL;
     lol_t *prev = NULL;
     for (log = lol_list; log; log = log->next, free(prev)) {
@@ -302,7 +305,6 @@ void lol_fini()
     }
     lol_list = NULL;
 }
-
 
 int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
                     lol_level_e file_level)
