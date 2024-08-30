@@ -11,6 +11,8 @@ prefix = get_option('prefix')
 bindir = join_paths(prefix, get_option('bindir'))
 libdir = join_paths(prefix, get_option('libdir'))
 
+libpthread_dep = cc.find_library('pthread', required : true)
+
 lol_sources = [
     'lol.c',
 ]
@@ -19,6 +21,7 @@ lol_lib = library(
     'lol',
     lol_sources,
     include_directories: ['.'],
+    dependencies : [libpthread_dep],
     install_dir: libdir,
     install: true,
 )
@@ -26,6 +29,7 @@ lol_lib = library(
 # for extern use
 lol_dep = declare_dependency(
     link_with : lol_lib,
+    dependencies : [libpthread_dep],
     include_directories : ['.'],
 )
 
@@ -58,6 +62,16 @@ executable(
     'example.c',
     include_directories: ['.'],
     dependencies: [lol_dep],
+    install_rpath: libdir,
+    install_dir: bindir,
+    install: true,
+)
+
+executable(
+    'lol-test',
+    'test.c',
+    include_directories: ['.'],
+    dependencies: [lol_dep, libpthread_dep],
     install_rpath: libdir,
     install_dir: bindir,
     install: true,

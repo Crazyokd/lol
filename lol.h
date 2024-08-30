@@ -24,13 +24,22 @@ typedef enum {
 /* API */
 /**
  * initialize lol with custom settings
+ *
+ * it support multiple calls in multi-thread environment.
  */
 int lol_init(const char *domain, lol_level_e std_level, const char *file,
              lol_level_e file_level);
 /**
  * initialize lol with default settings
  */
-int lol_init2();
+#define lol_init2() lol_init(NULL, LOL_INFO, NULL, LOL_NONE);
+
+/**
+ * release all resources allocated by lol
+ *
+ * it support multiple calls in single thread environment.
+ * but thread-unsafe
+ */
 void lol_fini();
 
 int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
