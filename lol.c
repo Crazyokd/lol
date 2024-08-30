@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <pthread.h>
 
 #define NOR "\033[0m"                 /* all off */
 #define FGC_BLACK "\033[30m"          /* Foreground Color: Black */
@@ -242,17 +243,22 @@ void lol_printf(lol_level_e level, const char *domain_id,
     va_end(args);
 }
 
+static pthread_mutex_t lol_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int lol_init(const char *domain, lol_level_e std_level, const char *file,
              lol_level_e file_level)
 {
+    pthread_mutex_lock(&lol_mutex);
     /* the lol only can be initialized once */
-    if (lol_list)
+    if (lol_list) {
+        pthread_mutex_unlock(&lol_mutex);
         return lol_add_domain(domain, std_level, file, file_level);
+    }
 
     /* init log_list */
     lol_list = calloc(1, sizeof(lol_t));
     if (!lol_list) {
+        pthread_mutex_unlock(&lol_mutex);
         return -1;
     }
 
@@ -261,12 +267,15 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
         lol_list->domain = malloc(strlen(domain)+1);
         if (!lol_list->domain) {
             free(lol_list);
+            lol_list = NULL;
+            pthread_mutex_unlock(&lol_mutex);
             return -1;
         }
         strcpy(lol_list->domain, domain);
         lol_list->print.domain = 1;
     }
     g_lol_domain = domain;
+    pthread_mutex_unlock(&lol_mutex);
     lol_list->level = std_level;
 
     /* add default writer */
@@ -286,11 +295,6 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
     return 0;
 }
 
-int lol_init2()
-{
-    return lol_init(NULL, LOL_INFO, NULL, LOL_NONE);
-}
-
 void lol_fini()
 {
     if (!lol_list) return;
@@ -304,6 +308,7 @@ void lol_fini()
         prev = log;
     }
     lol_list = NULL;
+    pthread_mutex_destroy(&lol_mutex);
 }
 
 int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
