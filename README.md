@@ -2,6 +2,13 @@
 named Log fOr Log.
 
 # Compile
+
+## use make
+```shell
+make
+```
+
+## use meson
 ```shell
 meson setup --prefix=`pwd`/install build
 meson install -C build && ./install/bin/lol-example
