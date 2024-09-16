@@ -4,11 +4,13 @@ named Log fOr Log.
 # Compile
 
 ## use make
+
 ```shell
 make
 ```
 
 ## use meson
+
 ```shell
 meson setup --prefix=`pwd`/install build
 meson install -C build && ./install/bin/lol-example
@@ -20,7 +22,8 @@ meson compile format -C build
 ```
 
 # Usage
-```shell
+
+```c
 lol_init2();
 
 lol_fatal("fatal");
@@ -40,3 +43,8 @@ lol_trace2("test", "trace");
 
 lol_fini();
 ```
+
+# TODO
+
+- [ ] add support for log file
+- [ ] add support for log file rotate

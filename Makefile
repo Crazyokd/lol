@@ -1,5 +1,5 @@
-CFLAGS=-g -Wall -W -std=c99
-LDFLAGS=-L. -Wl,-R. -llol -static
+CFLAGS=-g -Wall -W -std=gnu99 -fvisibility=hidden
+LDFLAGS=-Wl,--as-needed -L. -Wl,-R. -Wl,-Bstatic -llol -Wl,-Bdynamic
 
 C_SOURCES := $(wildcard *.c)
 D_FILES := $(patsubst %.c,%.d,$(C_SOURCES))
