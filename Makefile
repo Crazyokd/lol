@@ -1,4 +1,4 @@
-CFLAGS=-g -Wall -W -std=gnu99 -fvisibility=hidden
+CFLAGS=-g -ggdb -Wall -W -std=gnu99 -fvisibility=hidden
 LDFLAGS=-Wl,--as-needed -L. -Wl,-R. -Wl,-Bstatic -llol -Wl,-Bdynamic
 
 C_SOURCES := $(wildcard *.c)
@@ -9,7 +9,7 @@ all: generate-deps liblol.a liblol.so lol-example lol-test
 
 generate-deps: $(D_FILES)
 
-lol-example: example.o
+lol-example: example.o liblol.so liblol.a
 	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
 
 lol-test: test.o
@@ -40,4 +40,4 @@ help:
 	pr --omit-pagination --width=80 --columns=4
 
 clean:
-	rm -f *.o *.d lol-example lol-test liblol.a liblol.so
+	rm -f *.o *.d lol-example lol-test liblol.a liblol.so *.log

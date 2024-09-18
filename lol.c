@@ -38,9 +38,13 @@ typedef struct lol_s {
     } print;
 
     char *domain;
-    lol_level_e level;
+    lol_level_e std_level;
+    lol_level_e file_level;
+#define LOL_TARGET_STD  (1)
+#define LOL_TARGET_FILE (1 << 1)
+    uint8_t target;
     FILE *out;
-    void (*writer)(struct lol_s *log, lol_level_e level, const char *string);
+    void (*writer)(FILE *out, const char *string);
 
     struct lol_s *next;
 } lol_t;
@@ -49,10 +53,15 @@ static lol_t *lol_list = NULL;
 
 static const char *g_lol_domain = NULL;
 
-static void file_writer(lol_t *log, lol_level_e level, const char *string)
+static inline FILE *get_default_std_target()
 {
-    fprintf(log->out, "%s", string);
-    fflush(log->out);
+    return stderr;
+}
+
+static void default_writer(FILE *out, const char *string)
+{
+    fprintf(out, "%s", string);
+    fflush(out);
 }
 
 /* the size parameter include trailing '\0' */
@@ -157,13 +166,48 @@ static char *log_linefeed(char *buf, char *last)
     return lol_slprintf(buf, last, "\n");
 }
 
+static inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
+                                   const char *domain_name, int err,
+                                   const char *file, int line, const char *func,
+                                   int content_only, const char *format,
+                                   va_list ap)
+{
+    char logstr[LOL_MAX_LEN];
+    char *p, *last;
+
+    p = logstr;
+    last = logstr + LOL_MAX_LEN;
+
+    if (!content_only) {
+        if (log->print.timestamp) p = log_timestamp(p, last, log->print.color);
+        if (log->print.domain)
+            p = log_domain(p, last, domain_name, log->print.color);
+        if (log->print.level) p = log_level(p, last, level, log->print.color);
+    }
+
+    p = log_content(p, last, format, ap);
+
+    if (err) {
+        char errbuf[LOL_MAX_LEN];
+        p = lol_slprintf(p, last, " (%d:%s)", (int)err,
+                         strerror_r(err, errbuf, LOL_MAX_LEN));
+    }
+
+    if (!content_only) {
+        if (log->print.fileline)
+            p = lol_slprintf(p, last, " (%s:%d)", file, line);
+        if (log->print.function) p = lol_slprintf(p, last, " %s()", func);
+        if (log->print.linefeed) p = log_linefeed(p, last);
+    }
+
+    log->writer(out, logstr);
+}
+
 static void lol_vprintf(lol_level_e level, const char *domain_name, int err,
                         const char *file, int line, const char *func,
                         int content_only, const char *format, va_list ap)
 {
     lol_t *log = NULL;
-    char logstr[LOL_MAX_LEN];
-    char *p, *last;
 
     if (!domain_name) {
         domain_name = g_lol_domain;
@@ -177,36 +221,15 @@ static void lol_vprintf(lol_level_e level, const char *domain_name, int err,
         if ((!log->domain || !domain_name) && log->domain != domain_name)
             continue;
 
-        if (log->level < level) return;
-
-        p = logstr;
-        last = logstr + LOL_MAX_LEN;
-
-        if (!content_only) {
-            if (log->print.timestamp)
-                p = log_timestamp(p, last, log->print.color);
-            if (log->print.domain)
-                p = log_domain(p, last, domain_name, log->print.color);
-            if (log->print.level)
-                p = log_level(p, last, level, log->print.color);
+        if (log->std_level >= level && (log->target & LOL_TARGET_STD)) {
+            lol_compose_str(log, get_default_std_target(), level, domain_name,
+                            err, file, line, func, content_only, format, ap);
         }
-
-        p = log_content(p, last, format, ap);
-
-        if (err) {
-            char errbuf[LOL_MAX_LEN];
-            p = lol_slprintf(p, last, " (%d:%s)", (int)err,
-                             strerror_r(err, errbuf, LOL_MAX_LEN));
+        if ((log->target & LOL_TARGET_FILE) && log->file_level >= level) {
+            lol_compose_str(log, log->out, level, domain_name, err, file, line,
+                            func, content_only, format, ap);
         }
-
-        if (!content_only) {
-            if (log->print.fileline)
-                p = lol_slprintf(p, last, " (%s:%d)", file, line);
-            if (log->print.function) p = lol_slprintf(p, last, " %s()", func);
-            if (log->print.linefeed) p = log_linefeed(p, last);
-        }
-
-        log->writer(log, level, logstr);
+        break;
     }
 }
 
@@ -223,6 +246,32 @@ void lol_printf(lol_level_e level, const char *domain_id, int err,
 }
 
 static pthread_mutex_t lol_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+static inline void init_lol(lol_t *log, lol_level_e std_level,
+                       const char *file, lol_level_e file_level)
+{
+    /* add default writer */
+    log->target |= LOL_TARGET_STD;
+    log->std_level = std_level;
+    if (file && strlen(file) && (log->out = fopen(file, "a"))) {
+        log->target |= LOL_TARGET_FILE;
+        /* 文件日志级别小于标准输出日志级别我不认为有任何意义 */
+        log->file_level = (std_level > file_level ? std_level : file_level);
+    } else {
+        // assert?
+    }
+    log->writer = default_writer;
+
+    /* add default properties */
+#if !defined(_WIN32)
+    log->print.color = 1;
+#endif
+    log->print.timestamp = 1;
+    log->print.level = 1;
+    log->print.fileline = 1;
+    log->print.function = 1;
+    log->print.linefeed = 1;
+}
 
 int lol_init(const char *domain, lol_level_e std_level, const char *file,
              lol_level_e file_level)
@@ -255,21 +304,8 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
     }
     g_lol_domain = domain;
     pthread_mutex_unlock(&lol_mutex);
-    lol_list->level = std_level;
 
-    /* add default writer */
-    lol_list->out = stderr;
-    lol_list->writer = file_writer;
-
-    /* add default properties */
-#if !defined(_WIN32)
-    lol_list->print.color = 1;
-#endif
-    lol_list->print.timestamp = 1;
-    lol_list->print.level = 1;
-    lol_list->print.fileline = 1;
-    lol_list->print.function = 1;
-    lol_list->print.linefeed = 1;
+    init_lol(lol_list, std_level, file, file_level);
 
     return 0;
 }
@@ -283,6 +319,9 @@ void lol_fini()
     for (log = lol_list; log; log = log->next, free(prev)) {
         if (log->print.domain) {
             free(log->domain);
+        }
+        if (log->out && (log->target & LOL_TARGET_FILE)) {
+            fclose(log->out);
         }
         prev = log;
     }
@@ -323,21 +362,8 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     }
     strcpy(log->domain, domain);
     log->print.domain = 1;
-    log->level = std_level;
 
-    /* add default writer */
-    log->out = stderr;
-    log->writer = file_writer;
-
-    /* add default properties */
-#if !defined(_WIN32)
-    log->print.color = 1;
-#endif
-    log->print.timestamp = 1;
-    log->print.level = 1;
-    log->print.fileline = 1;
-    log->print.function = 1;
-    log->print.linefeed = 1;
+    init_lol(log, std_level, file, file_level);
 
     /* add log to the tail of lol_list */
     while (next->next) next = next->next;

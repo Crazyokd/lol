@@ -8,8 +8,12 @@ int main(int argc, char **argv)
         lol_init2();
     } else if (argc == 2) {
         lol_init(NULL, atoi(argv[1]), NULL, LOL_NONE);
+    } else if (argc == 3) {
+        lol_init(argv[2], atoi(argv[1]), NULL, LOL_NONE);
+    } else if (argc == 4) {
+        lol_init(argv[2], atoi(argv[1]), argv[3], LOL_NONE);
     } else {
-        lol_init(argv[1], atoi(argv[2]), NULL, LOL_NONE);
+        lol_init(argv[2], atoi(argv[1]), argv[3], atoi(argv[4]));
     }
     /* we support multiple call init */
     lol_init2();

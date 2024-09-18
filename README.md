@@ -46,5 +46,5 @@ lol_fini();
 
 # TODO
 
-- [ ] add support for log file
+- [x] add support for log file
 - [ ] add support for log file rotate
