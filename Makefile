@@ -29,6 +29,9 @@ liblol.a: lol.o
 
 include $(wildcard *.d)
 
+format:
+	find . -type f -name "*.[ch]" | xargs clang-format -i
+
 help:
 	@$(MAKE) --print-data-base --question |       						  \
 	awk '/^[^.%][-a-zA-Z0-9_]*:/ {print substr($$1, 1, length($$1)-1)}' | \

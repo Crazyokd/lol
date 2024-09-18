@@ -1,8 +1,9 @@
-#include "lol.h"
-
 #include <stdlib.h>
 
-int main(int argc, char **argv) {
+#include "lol.h"
+
+int main(int argc, char **argv)
+{
     if (argc == 1) {
         lol_init2();
     } else if (argc == 2) {

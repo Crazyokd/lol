@@ -1,10 +1,10 @@
-#include "lol.h"
-
-#include <stdlib.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#define THREAD_CNT 100
+#include "lol.h"
+
+#define THREAD_CNT     100
 #define THREAD_LOG_CNT 100
 
 void *log_thread(void *arg)
@@ -27,10 +27,11 @@ void *log_thread(void *arg)
     return NULL;
 }
 
-int main() {
+int main()
+{
     pthread_t threads[THREAD_CNT];
     for (int i = 0; i < THREAD_CNT; i++) {
-        pthread_create(threads+i, NULL, log_thread, NULL);
+        pthread_create(threads + i, NULL, log_thread, NULL);
     }
 
     for (int i = 0; i < THREAD_CNT; i++) {

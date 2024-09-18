@@ -6,22 +6,22 @@
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef BUILDING_DLL
     #ifdef __GNUC__
-      #define DLL_PUBLIC __attribute__ ((dllexport))
+      #define DLL_PUBLIC __attribute__((dllexport))
     #else
-      #define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+      #define DLL_PUBLIC __declspec(dllexport)
     #endif
   #else
     #ifdef __GNUC__
-      #define DLL_PUBLIC __attribute__ ((dllimport))
+      #define DLL_PUBLIC __attribute__((dllimport))
     #else
-      #define DLL_PUBLIC __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+      #define DLL_PUBLIC __declspec(dllimport)
     #endif
   #endif
   #define DLL_LOCAL
 #else
   #if __GNUC__ >= 4
-    #define DLL_PUBLIC __attribute__ ((visibility ("default")))
-    #define DLL_LOCAL  __attribute__ ((visibility ("hidden")))
+    #define DLL_PUBLIC __attribute__((visibility("default")))
+    #define DLL_LOCAL  __attribute__((visibility("hidden")))
   #else
     #define DLL_PUBLIC
     #define DLL_LOCAL
@@ -44,7 +44,15 @@ typedef enum {
     LOL_FULL = LOL_TRACE,
 } lol_level_e;
 
-#define LOL_FUNC __func__
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+  #if defined __GNUC__ && __GNUC__ >= 2
+    #define LOL_FUNC __FUNCTION__
+  #else
+    #define LOL_FUNC "<unknown>"
+  #endif
+#else
+  #define LOL_FUNC __func__
+#endif
 
 /* API */
 /**
@@ -52,8 +60,8 @@ typedef enum {
  *
  * it support multiple calls in multi-thread environment.
  */
-DLL_PUBLIC int lol_init(const char *domain, lol_level_e std_level, const char *file,
-             lol_level_e file_level);
+DLL_PUBLIC int lol_init(const char *domain, lol_level_e std_level,
+                        const char *file, lol_level_e file_level);
 /**
  * initialize lol with default settings
  */
@@ -67,18 +75,17 @@ DLL_PUBLIC int lol_init(const char *domain, lol_level_e std_level, const char *f
  */
 DLL_PUBLIC void lol_fini();
 
-DLL_PUBLIC int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
-                   lol_level_e file_level);
+DLL_PUBLIC int lol_add_domain(const char *domain, lol_level_e std_level,
+                              const char *file, lol_level_e file_level);
 
 DLL_PUBLIC lol_level_e lol_string_to_level(const char *level);
 
 DLL_PUBLIC void lol_printf(lol_level_e level, const char *domain_id, int err,
-                const char *file, int line, const char *func, int content_only,
-                const char *format, ...);
+                           const char *file, int line, const char *func,
+                           int content_only, const char *format, ...);
 
-#define lol_message(level, domain, errno, ...)                        \
-    lol_printf(level, domain, errno, __FILE__, __LINE__, LOL_FUNC, 0, \
-               __VA_ARGS__)
+#define lol_message(level, domain, errno, ...) \
+  lol_printf(level, domain, errno, __FILE__, __LINE__, LOL_FUNC, 0, __VA_ARGS__)
 
 #define lol_fatal(...)     lol_message(LOL_FATAL, 0, 0, __VA_ARGS__)
 #define lol_error(...)     lol_message(LOL_ERROR, 0, 0, __VA_ARGS__)
