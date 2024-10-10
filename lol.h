@@ -102,6 +102,22 @@ DLL_PUBLIC void lol_printf(lol_level_e level, const char *domain_id, int err,
 #define lol_debug2(d, ...) lol_message(LOL_DEBUG, d, 0, __VA_ARGS__)
 #define lol_trace2(d, ...) lol_message(LOL_TRACE, d, 0, __VA_ARGS__)
 
+/* lol_xxx_with_errno function family */
+#define lol_fatal_e(e, ...)     lol_message(LOL_FATAL, 0, e, __VA_ARGS__)
+#define lol_error_e(e, ...)     lol_message(LOL_ERROR, 0, e, __VA_ARGS__)
+#define lol_warn_e(e, ...)      lol_message(LOL_WARN, 0, e, __VA_ARGS__)
+#define lol_info_e(e, ...)      lol_message(LOL_INFO, 0, e, __VA_ARGS__)
+#define lol_debug_e(e, ...)     lol_message(LOL_DEBUG, 0, e, __VA_ARGS__)
+#define lol_trace_e(e, ...)     lol_message(LOL_TRACE, 0, e, __VA_ARGS__)
+
+/* lol_xxx_with_domain_and_errno function family */
+#define lol_fatal_de(d, e, ...)     lol_message(LOL_FATAL, d, e, __VA_ARGS__)
+#define lol_error_de(d, e, ...)     lol_message(LOL_ERROR, d, e, __VA_ARGS__)
+#define lol_warn_de(d, e, ...)      lol_message(LOL_WARN, d, e, __VA_ARGS__)
+#define lol_info_de(d, e, ...)      lol_message(LOL_INFO, d, e, __VA_ARGS__)
+#define lol_debug_de(d, e, ...)     lol_message(LOL_DEBUG, d, e, __VA_ARGS__)
+#define lol_trace_de(d, e, ...)     lol_message(LOL_TRACE, d, e, __VA_ARGS__)
+
 #ifdef __cplusplus
 }
 #endif

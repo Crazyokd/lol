@@ -188,9 +188,9 @@ static inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
     p = log_content(p, last, format, ap);
 
     if (err) {
-        char errbuf[LOL_MAX_LEN];
-        p = lol_slprintf(p, last, " (%d:%s)", (int)err,
-                         strerror_r(err, errbuf, LOL_MAX_LEN));
+        char errbuf[LOL_MAX_LEN >> 6];
+        strerror_r(err, errbuf, LOL_MAX_LEN >> 6);
+        p = lol_slprintf(p, last, " (%d:%s)", (int)err, errbuf);
     }
 
     if (!content_only) {
@@ -247,8 +247,8 @@ void lol_printf(lol_level_e level, const char *domain_id, int err,
 
 static pthread_mutex_t lol_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static inline void init_lol(lol_t *log, lol_level_e std_level,
-                       const char *file, lol_level_e file_level)
+static inline void init_lol(lol_t *log, lol_level_e std_level, const char *file,
+                            lol_level_e file_level)
 {
     /* add default writer */
     log->target |= LOL_TARGET_STD;
@@ -302,7 +302,7 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
         strcpy(lol_list->domain, domain);
         lol_list->print.domain = 1;
     }
-    g_lol_domain = domain;
+    g_lol_domain = lol_list->domain;
     pthread_mutex_unlock(&lol_mutex);
 
     init_lol(lol_list, std_level, file, file_level);

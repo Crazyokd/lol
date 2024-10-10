@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "lol.h"
 
@@ -27,6 +28,18 @@ void *log_thread(void *arg)
     return NULL;
 }
 
+void test_errno()
+{
+    lol_init("errno", LOL_INFO, NULL, LOL_NONE);
+    FILE *f = fopen("nonexist", "r");
+    // perror("");
+    lol_error_e(errno, "");
+    lol_error_de("errno", errno, "");
+    if (f) {
+        fclose(f);
+    }
+}
+
 int main()
 {
     pthread_t threads[THREAD_CNT];
@@ -37,6 +50,8 @@ int main()
     for (int i = 0; i < THREAD_CNT; i++) {
         pthread_join(threads[i], NULL);
     }
+
+    test_errno();
 
     lol_fini();
     return 0;
