@@ -80,43 +80,100 @@ DLL_PUBLIC int lol_add_domain(const char *domain, lol_level_e std_level,
 
 DLL_PUBLIC lol_level_e lol_string_to_level(const char *level);
 
-DLL_PUBLIC void lol_printf(lol_level_e level, const char *domain_id, int err,
-                           const char *file, int line, const char *func,
-                           int content_only, const char *format, ...);
+/**
+ * get specific lol_t by domain(for performance)
+ */
+void *lol_get(const char *domain);
 
-#define lol_message(level, domain, errno, ...) \
-  lol_printf(level, domain, errno, __FILE__, __LINE__, LOL_FUNC, 0, __VA_ARGS__)
+DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
+                           int err, const char *file, int line,
+                           const char *func, int content_only,
+                           const char *format, ...);
 
-#define lol_fatal(...)     lol_message(LOL_FATAL, 0, 0, __VA_ARGS__)
-#define lol_error(...)     lol_message(LOL_ERROR, 0, 0, __VA_ARGS__)
-#define lol_warn(...)      lol_message(LOL_WARN, 0, 0, __VA_ARGS__)
-#define lol_info(...)      lol_message(LOL_INFO, 0, 0, __VA_ARGS__)
-#define lol_debug(...)     lol_message(LOL_DEBUG, 0, 0, __VA_ARGS__)
-#define lol_trace(...)     lol_message(LOL_TRACE, 0, 0, __VA_ARGS__)
+#define lol_message(level, log, domain, errno, ...)                      \
+  lol_printf(level, log, domain, errno, __FILE__, __LINE__, LOL_FUNC, 0, \
+             __VA_ARGS__)
+
+#define lol_fatal(...)     lol_message(LOL_FATAL, 0, 0, 0, __VA_ARGS__)
+#define lol_error(...)     lol_message(LOL_ERROR, 0, 0, 0, __VA_ARGS__)
+#define lol_warn(...)      lol_message(LOL_WARN, 0, 0, 0, __VA_ARGS__)
+#define lol_info(...)      lol_message(LOL_INFO, 0, 0, 0, __VA_ARGS__)
+#define lol_debug(...)     lol_message(LOL_DEBUG, 0, 0, 0, __VA_ARGS__)
+#define lol_trace(...)     lol_message(LOL_TRACE, 0, 0, 0, __VA_ARGS__)
 
 /* lol_xxx_with_domain function family */
-#define lol_fatal2(d, ...) lol_message(LOL_FATAL, d, 0, __VA_ARGS__)
-#define lol_error2(d, ...) lol_message(LOL_ERROR, d, 0, __VA_ARGS__)
-#define lol_warn2(d, ...)  lol_message(LOL_WARN, d, 0, __VA_ARGS__)
-#define lol_info2(d, ...)  lol_message(LOL_INFO, d, 0, __VA_ARGS__)
-#define lol_debug2(d, ...) lol_message(LOL_DEBUG, d, 0, __VA_ARGS__)
-#define lol_trace2(d, ...) lol_message(LOL_TRACE, d, 0, __VA_ARGS__)
+#define lol_fatal2(d, ...) lol_message(LOL_FATAL, 0, d, 0, __VA_ARGS__)
+#define lol_error2(d, ...) lol_message(LOL_ERROR, 0, d, 0, __VA_ARGS__)
+#define lol_warn2(d, ...)  lol_message(LOL_WARN, 0, d, 0, __VA_ARGS__)
+#define lol_info2(d, ...)  lol_message(LOL_INFO, 0, d, 0, __VA_ARGS__)
+#define lol_debug2(d, ...) lol_message(LOL_DEBUG, 0, d, 0, __VA_ARGS__)
+#define lol_trace2(d, ...) lol_message(LOL_TRACE, 0, d, 0, __VA_ARGS__)
+
+/* lol_xxx_with_domain for performance */
+#define lol_fatal3(d, ...)                                    \
+  do {                                                        \
+    static void *lol_name_##d = NULL;                         \
+    if (lol_name_##d == NULL) {                               \
+      lol_name_##d = lol_get(#d);                             \
+    }                                                         \
+    lol_message(LOL_FATAL, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
+#define lol_error3(d, ...)                                    \
+  do {                                                        \
+    static void *lol_name_##d = NULL;                         \
+    if (lol_name_##d == NULL) {                               \
+      lol_name_##d = lol_get(#d);                             \
+    }                                                         \
+    lol_message(LOL_ERROR, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
+#define lol_warn3(d, ...)                                    \
+  do {                                                       \
+    static void *lol_name_##d = NULL;                        \
+    if (lol_name_##d == NULL) {                              \
+      lol_name_##d = lol_get(#d);                            \
+    }                                                        \
+    lol_message(LOL_WARN, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
+#define lol_info3(d, ...)                                    \
+  do {                                                       \
+    static void *lol_name_##d = NULL;                        \
+    if (lol_name_##d == NULL) {                              \
+      lol_name_##d = lol_get(#d);                            \
+    }                                                        \
+    lol_message(LOL_INFO, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
+#define lol_debug3(d, ...)                                    \
+  do {                                                        \
+    static void *lol_name_##d = NULL;                         \
+    if (lol_name_##d == NULL) {                               \
+      lol_name_##d = lol_get(#d);                             \
+    }                                                         \
+    lol_message(LOL_DEBUG, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
+#define lol_trace3(d, ...)                                    \
+  do {                                                        \
+    static void *lol_name_##d = NULL;                         \
+    if (lol_name_##d == NULL) {                               \
+      lol_name_##d = lol_get(#d);                             \
+    }                                                         \
+    lol_message(LOL_TRACE, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
 
 /* lol_xxx_with_errno function family */
-#define lol_fatal_e(e, ...)     lol_message(LOL_FATAL, 0, e, __VA_ARGS__)
-#define lol_error_e(e, ...)     lol_message(LOL_ERROR, 0, e, __VA_ARGS__)
-#define lol_warn_e(e, ...)      lol_message(LOL_WARN, 0, e, __VA_ARGS__)
-#define lol_info_e(e, ...)      lol_message(LOL_INFO, 0, e, __VA_ARGS__)
-#define lol_debug_e(e, ...)     lol_message(LOL_DEBUG, 0, e, __VA_ARGS__)
-#define lol_trace_e(e, ...)     lol_message(LOL_TRACE, 0, e, __VA_ARGS__)
+#define lol_fatal_e(e, ...)     lol_message(LOL_FATAL, 0, 0, e, __VA_ARGS__)
+#define lol_error_e(e, ...)     lol_message(LOL_ERROR, 0, 0, e, __VA_ARGS__)
+#define lol_warn_e(e, ...)      lol_message(LOL_WARN, 0, 0, e, __VA_ARGS__)
+#define lol_info_e(e, ...)      lol_message(LOL_INFO, 0, 0, e, __VA_ARGS__)
+#define lol_debug_e(e, ...)     lol_message(LOL_DEBUG, 0, 0, e, __VA_ARGS__)
+#define lol_trace_e(e, ...)     lol_message(LOL_TRACE, 0, 0, e, __VA_ARGS__)
 
 /* lol_xxx_with_domain_and_errno function family */
-#define lol_fatal_de(d, e, ...)     lol_message(LOL_FATAL, d, e, __VA_ARGS__)
-#define lol_error_de(d, e, ...)     lol_message(LOL_ERROR, d, e, __VA_ARGS__)
-#define lol_warn_de(d, e, ...)      lol_message(LOL_WARN, d, e, __VA_ARGS__)
-#define lol_info_de(d, e, ...)      lol_message(LOL_INFO, d, e, __VA_ARGS__)
-#define lol_debug_de(d, e, ...)     lol_message(LOL_DEBUG, d, e, __VA_ARGS__)
-#define lol_trace_de(d, e, ...)     lol_message(LOL_TRACE, d, e, __VA_ARGS__)
+#define lol_fatal_de(d, e, ...) lol_message(LOL_FATAL, 0, d, e, __VA_ARGS__)
+#define lol_error_de(d, e, ...) lol_message(LOL_ERROR, 0, d, e, __VA_ARGS__)
+#define lol_warn_de(d, e, ...)  lol_message(LOL_WARN, 0, d, e, __VA_ARGS__)
+#define lol_info_de(d, e, ...)  lol_message(LOL_INFO, 0, d, e, __VA_ARGS__)
+#define lol_debug_de(d, e, ...) lol_message(LOL_DEBUG, 0, d, e, __VA_ARGS__)
+#define lol_trace_de(d, e, ...) lol_message(LOL_TRACE, 0, d, e, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

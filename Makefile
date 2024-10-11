@@ -5,7 +5,7 @@ C_SOURCES := $(wildcard *.c)
 D_FILES := $(patsubst %.c,%.d,$(C_SOURCES))
 
 .PHONY: clean all generate-deps help
-all: generate-deps liblol.a liblol.so lol-example lol-test
+all: generate-deps liblol.a liblol.so lol-example lol-test lol-test2
 
 generate-deps: $(D_FILES)
 
@@ -13,6 +13,9 @@ lol-example: example.o liblol.so liblol.a
 	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
 
 lol-test: test.o
+	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
+
+lol-test2: test2.o
 	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
 
 liblol.so: lol.c
@@ -40,4 +43,4 @@ help:
 	pr --omit-pagination --width=80 --columns=4
 
 clean:
-	rm -f *.o *.d lol-example lol-test liblol.a liblol.so *.log
+	rm -f *.o *.d lol-example lol-test lol-test2 liblol.a liblol.so *.log

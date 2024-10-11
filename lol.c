@@ -203,18 +203,16 @@ static inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
     log->writer(out, logstr);
 }
 
-static void lol_vprintf(lol_level_e level, const char *domain_name, int err,
-                        const char *file, int line, const char *func,
+static void lol_vprintf(lol_level_e level, lol_t *log, const char *domain_name,
+                        int err, const char *file, int line, const char *func,
                         int content_only, const char *format, va_list ap)
 {
-    lol_t *log = NULL;
-
     if (!domain_name) {
         domain_name = g_lol_domain;
     }
 
     /* 遍历所有domain */
-    for (log = lol_list; log; log = log->next) {
+    for (log = log ? log : lol_list; log; log = log->next) {
         /* 通过domain_name匹配目标lol_t */
         if (log->domain && domain_name && strcmp(log->domain, domain_name))
             continue;
@@ -233,15 +231,15 @@ static void lol_vprintf(lol_level_e level, const char *domain_name, int err,
     }
 }
 
-void lol_printf(lol_level_e level, const char *domain_id, int err,
+void lol_printf(lol_level_e level, void *log, const char *domain_id, int err,
                 const char *file, int line, const char *func, int content_only,
                 const char *format, ...)
 {
     va_list args;
 
     va_start(args, format);
-    lol_vprintf(level, domain_id, err, file, line, func, content_only, format,
-                args);
+    lol_vprintf(level, log, domain_id, err, file, line, func, content_only,
+                format, args);
     va_end(args);
 }
 
@@ -393,4 +391,19 @@ lol_level_e lol_string_to_level(const char *level)
         level_e = LOL_INFO;
     }
     return level_e;
+}
+
+void *lol_get(const char *domain)
+{
+    if (!domain || !strlen(domain)) return NULL;
+
+    lol_t *log = lol_list;
+    while (log) {
+        if (log->domain && !strcmp(log->domain, domain)) {
+            break;
+        } else {
+            log = log->next;
+        }
+    }
+    return log;
 }

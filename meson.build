@@ -77,6 +77,16 @@ executable(
     install: true,
 )
 
+executable(
+    'lol-test2',
+    'test2.c',
+    include_directories: ['.'],
+    dependencies: [lol_dep],
+    install_rpath: libdir,
+    install_dir: bindir,
+    install: true,
+)
+
 muon = find_program('muon', required: false) # https://github.com/annacrombie/muon
 if muon.found()
     run_target(
