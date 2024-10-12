@@ -24,6 +24,7 @@ meson compile format -C build
 # Usage
 
 ```c
+// lol_init("main", LOL_INFO, "lol.log", LOL_DEBUG);
 lol_init2();
 
 lol_fatal("fatal");
@@ -41,10 +42,17 @@ lol_info2("test", "info");
 lol_debug2("test", "debug");
 lol_trace2("test", "trace");
 
+// like lol_xxx2 but with better performance
+lol_fatal3(test, "fatal");
+lol_error3(test, "error");
+lol_warn3(test, "warn");
+lol_info3(test, "info");
+lol_debug3(test, "debug");
+lol_trace3(test, "trace");
 lol_fini();
 ```
 
 # TODO
 
 - [x] add support for log file
-- [ ] add support for log file rotate
+- [ ] optimize `libc_write` call

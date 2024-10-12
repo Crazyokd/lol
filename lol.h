@@ -90,7 +90,7 @@ DLL_PUBLIC lol_level_e lol_string_to_level(const char *level);
 /**
  * get specific lol_t by domain(for performance)
  */
-void *lol_get(const char *domain);
+DLL_PUBLIC void *lol_get(const char *domain);
 
 DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
                            int err, const char *file, int line,
