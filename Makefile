@@ -1,4 +1,4 @@
-CFLAGS=-g -ggdb -Wall -W -std=gnu99 -fvisibility=hidden
+CFLAGS=-g -ggdb -fno-omit-frame-pointer -Wall -W -std=gnu99 -fvisibility=hidden
 LDFLAGS=-Wl,--as-needed -L. -Wl,-R. -Wl,-Bstatic -llol -Wl,-Bdynamic
 
 C_SOURCES := $(wildcard *.c)

@@ -178,11 +178,13 @@ static inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
     p = logstr;
     last = logstr + LOL_MAX_LEN;
 
-    if (!content_only) {
-        if (log->print.timestamp) p = log_timestamp(p, last, log->print.color);
-        if (log->print.domain)
+    if (lol_likely(!content_only)) {
+        if (lol_likely(log->print.timestamp))
+            p = log_timestamp(p, last, log->print.color);
+        if (lol_likely(log->print.domain))
             p = log_domain(p, last, domain_name, log->print.color);
-        if (log->print.level) p = log_level(p, last, level, log->print.color);
+        if (lol_likely(log->print.level))
+            p = log_level(p, last, level, log->print.color);
     }
 
     p = log_content(p, last, format, ap);
@@ -193,11 +195,12 @@ static inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
         p = lol_slprintf(p, last, " (%d:%s)", (int)err, errbuf);
     }
 
-    if (!content_only) {
-        if (log->print.fileline)
+    if (lol_likely(!content_only)) {
+        if (lol_likely(log->print.fileline))
             p = lol_slprintf(p, last, " (%s:%d)", file, line);
-        if (log->print.function) p = lol_slprintf(p, last, " %s()", func);
-        if (log->print.linefeed) p = log_linefeed(p, last);
+        if (lol_likely(log->print.function))
+            p = lol_slprintf(p, last, " %s()", func);
+        if (lol_likely(log->print.linefeed)) p = log_linefeed(p, last);
     }
 
     log->writer(out, logstr);
@@ -208,17 +211,20 @@ static void lol_vprintf(lol_level_e level, lol_t *log, const char *domain_name,
                         int content_only, const char *format, va_list ap)
 {
     if (!domain_name) {
+        log = lol_list;
         domain_name = g_lol_domain;
     }
+    if (log) goto perf;
 
     /* 遍历所有domain */
-    for (log = log ? log : lol_list; log; log = log->next) {
+    for (log = lol_list; log; log = log->next) {
         /* 通过domain_name匹配目标lol_t */
         if (log->domain && domain_name && strcmp(log->domain, domain_name))
             continue;
         if ((!log->domain || !domain_name) && log->domain != domain_name)
             continue;
 
+perf:
         if (log->std_level >= level && (log->target & LOL_TARGET_STD)) {
             lol_compose_str(log, get_default_std_target(), level, domain_name,
                             err, file, line, func, content_only, format, ap);
@@ -330,7 +336,7 @@ void lol_fini()
 int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
                    lol_level_e file_level)
 {
-    if (!lol_list || !domain || !strlen(domain)) return -1;
+    if (lol_unlikely(!lol_list || !domain || !strlen(domain))) return -1;
 
     lol_t *log, *next;
 
@@ -348,13 +354,13 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
 
     /* init log_list */
     log = calloc(1, sizeof(lol_t));
-    if (!log) {
+    if (lol_unlikely(!log)) {
         return -1;
     }
 
     /* set log domain and level */
     log->domain = malloc(strlen(domain) + 1);
-    if (!log->domain) {
+    if (lol_unlikely(!log->domain)) {
         free(log);
         return -1;
     }

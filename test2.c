@@ -4,10 +4,11 @@
 
 #include "lol.h"
 
-#define DOMAIN_CNT       100
-#define REPEAT_PRINT_CNT 10000
-#define MAX_BUF_SIZE     16
+#define DOMAIN_CNT   100
+#define MAX_BUF_SIZE 16
 
+static int REPEAT_PRINT_CNT = 500;
+static int DO_NOT_USE_SYS = 1;
 void test_lol_x2()
 {
     char buffer[MAX_BUF_SIZE];
@@ -156,11 +157,14 @@ void test_init(int domain, char bufs[DOMAIN_CNT][MAX_BUF_SIZE])
 {
     snprintf(bufs[domain], MAX_BUF_SIZE, "%d", domain);
 
-    // lol_add_domain(bufs[domain], domain % 6 + 1, NULL, LOL_NONE);
-    lol_add_domain(bufs[domain], LOL_NONE, NULL, LOL_NONE);
+    if (DO_NOT_USE_SYS) {
+        lol_add_domain(bufs[domain], LOL_NONE, NULL, LOL_NONE);
+    } else {
+        lol_add_domain(bufs[domain], domain % 6 + 1, NULL, LOL_NONE);
+    }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     struct timeval start, end;
     double time_used1, time_used2, time_used3;
@@ -168,24 +172,37 @@ int main()
     // init
     char bufs[DOMAIN_CNT][MAX_BUF_SIZE];
     lol_init("main", LOL_INFO, NULL, LOL_NONE);
+    if (argc < 4) {
+        // 输出帮助信息
+        printf("Usage: %s [TEST_LOL_X2] [TEST_LOL_X2_2] [TEST_LOL_X3] "
+               "[REPEAT_PRINT_CNT] "
+               "[DO_NOT_USE_SYS]\n",
+               argv[0]);
+        return 1;
+    }
+    int test1 = argc > 1 && atoi(argv[1]);
+    int test2 = argc > 2 && atoi(argv[2]);
+    int test3 = argc > 3 && atoi(argv[3]);
+    if (argc > 4) REPEAT_PRINT_CNT = atoi(argv[4]);
+    if (argc > 5) DO_NOT_USE_SYS = atoi(argv[5]);
     for (int i = 0; i < DOMAIN_CNT; i++) {
         test_init(i, bufs);
     }
 
     gettimeofday(&start, NULL);
-    test_lol_x2();
+    if (test1) test_lol_x2();
     gettimeofday(&end, NULL);
     time_used1 =
         (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000000.0;
 
     gettimeofday(&start, NULL);
-    test_lol_x2_2(bufs);
+    if (test2) test_lol_x2_2(bufs);
     gettimeofday(&end, NULL);
     time_used2 =
         (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000000.0;
 
     gettimeofday(&start, NULL);
-    test_lol_x3();
+    if (test3) test_lol_x3();
     gettimeofday(&end, NULL);
     time_used3 =
         (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000000.0;

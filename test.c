@@ -25,7 +25,7 @@ void *log_thread(void *arg)
         lol_trace2(tid_str, "");
     }
 
-    return NULL;
+    return arg;
 }
 
 void test_errno()

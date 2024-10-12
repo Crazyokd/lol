@@ -54,6 +54,13 @@ typedef enum {
   #define LOL_FUNC __func__
 #endif
 
+#if defined(__GNUC__)
+  #define lol_likely(x)   __builtin_expect(!!(x), 1)
+  #define lol_unlikely(x) __builtin_expect(!!(x), 0)
+#else
+  #define lol_likely(v)   v
+  #define lol_unlikely(v) v
+#endif
 /* API */
 /**
  * initialize lol with custom settings
@@ -113,7 +120,7 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_fatal3(d, ...)                                    \
   do {                                                        \
     static void *lol_name_##d = NULL;                         \
-    if (lol_name_##d == NULL) {                               \
+    if (lol_unlikely(lol_name_##d == NULL)) {                 \
       lol_name_##d = lol_get(#d);                             \
     }                                                         \
     lol_message(LOL_FATAL, lol_name_##d, #d, 0, __VA_ARGS__); \
@@ -121,7 +128,7 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_error3(d, ...)                                    \
   do {                                                        \
     static void *lol_name_##d = NULL;                         \
-    if (lol_name_##d == NULL) {                               \
+    if (lol_unlikely(lol_name_##d == NULL)) {                 \
       lol_name_##d = lol_get(#d);                             \
     }                                                         \
     lol_message(LOL_ERROR, lol_name_##d, #d, 0, __VA_ARGS__); \
@@ -129,7 +136,7 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_warn3(d, ...)                                    \
   do {                                                       \
     static void *lol_name_##d = NULL;                        \
-    if (lol_name_##d == NULL) {                              \
+    if (lol_unlikely(lol_name_##d == NULL)) {                \
       lol_name_##d = lol_get(#d);                            \
     }                                                        \
     lol_message(LOL_WARN, lol_name_##d, #d, 0, __VA_ARGS__); \
@@ -137,7 +144,7 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_info3(d, ...)                                    \
   do {                                                       \
     static void *lol_name_##d = NULL;                        \
-    if (lol_name_##d == NULL) {                              \
+    if (lol_unlikely(lol_name_##d == NULL)) {                \
       lol_name_##d = lol_get(#d);                            \
     }                                                        \
     lol_message(LOL_INFO, lol_name_##d, #d, 0, __VA_ARGS__); \
@@ -145,7 +152,7 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_debug3(d, ...)                                    \
   do {                                                        \
     static void *lol_name_##d = NULL;                         \
-    if (lol_name_##d == NULL) {                               \
+    if (lol_unlikely(lol_name_##d == NULL)) {                 \
       lol_name_##d = lol_get(#d);                             \
     }                                                         \
     lol_message(LOL_DEBUG, lol_name_##d, #d, 0, __VA_ARGS__); \
@@ -153,7 +160,7 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_trace3(d, ...)                                    \
   do {                                                        \
     static void *lol_name_##d = NULL;                         \
-    if (lol_name_##d == NULL) {                               \
+    if (lol_unlikely(lol_name_##d == NULL)) {                 \
       lol_name_##d = lol_get(#d);                             \
     }                                                         \
     lol_message(LOL_TRACE, lol_name_##d, #d, 0, __VA_ARGS__); \
