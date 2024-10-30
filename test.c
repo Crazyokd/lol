@@ -14,7 +14,7 @@ void *log_thread(void *arg)
     char tid_str[32];
     snprintf(tid_str, sizeof(tid_str), "%lu", (unsigned long)tid);
 
-    lol_init(tid_str, tid % 7, NULL, LOL_NONE);
+    lol_init(tid_str, tid % 6 + 1, NULL, LOL_NONE);
 
     for (int i = 0; i < THREAD_LOG_CNT; i++) {
         lol_fatal2(tid_str, "");

@@ -1,5 +1,5 @@
 # LOL
-named Log fOr Log.
+named Logger fOr Log.
 
 # Compile
 
