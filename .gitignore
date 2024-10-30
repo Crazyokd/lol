@@ -4,3 +4,7 @@ install/
 *.log
 *.o
 *.d
+*.so
+*.a
+lol-example
+lol-test*

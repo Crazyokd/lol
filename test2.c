@@ -9,7 +9,7 @@
 
 static int REPEAT_PRINT_CNT = 500;
 static int DO_NOT_USE_SYS = 1;
-void test_lol_x2()
+static void test_lol_x2()
 {
     char buffer[MAX_BUF_SIZE];
     for (int i = 0; i < DOMAIN_CNT; i++) {
@@ -25,7 +25,7 @@ void test_lol_x2()
     }
 }
 
-void test_lol_x2_2(char bufs[DOMAIN_CNT][MAX_BUF_SIZE])
+static void test_lol_x2_2(char bufs[DOMAIN_CNT][MAX_BUF_SIZE])
 {
     for (int i = 0; i < DOMAIN_CNT; i++) {
         for (int j = 0; j < REPEAT_PRINT_CNT; j++) {
@@ -49,7 +49,7 @@ void test_lol_x2_2(char bufs[DOMAIN_CNT][MAX_BUF_SIZE])
     lol_trace3(d, "");                         \
   }
 
-void test_lol_x3()
+static void test_lol_x3()
 {
     test_repeat_print(0);
     test_repeat_print(1);
@@ -153,7 +153,7 @@ void test_lol_x3()
     test_repeat_print(99);
 }
 
-void test_init(int domain, char bufs[DOMAIN_CNT][MAX_BUF_SIZE])
+static void test_init(int domain, char bufs[DOMAIN_CNT][MAX_BUF_SIZE])
 {
     snprintf(bufs[domain], MAX_BUF_SIZE, "%d", domain);
 
