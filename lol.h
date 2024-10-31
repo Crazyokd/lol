@@ -116,55 +116,21 @@ DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_debug2(d, ...) lol_message(LOL_DEBUG, 0, d, 0, __VA_ARGS__)
 #define lol_trace2(d, ...) lol_message(LOL_TRACE, 0, d, 0, __VA_ARGS__)
 
+#define lol_xxx3(d, level, ...)                           \
+  do {                                                    \
+    static void *lol_name_##d = NULL;                     \
+    if (lol_unlikely(lol_name_##d == NULL)) {             \
+      lol_name_##d = lol_get(#d);                         \
+    }                                                     \
+    lol_message(level, lol_name_##d, #d, 0, __VA_ARGS__); \
+  } while (0);
 /* lol_xxx_with_domain for performance */
-#define lol_fatal3(d, ...)                                    \
-  do {                                                        \
-    static void *lol_name_##d = NULL;                         \
-    if (lol_unlikely(lol_name_##d == NULL)) {                 \
-      lol_name_##d = lol_get(#d);                             \
-    }                                                         \
-    lol_message(LOL_FATAL, lol_name_##d, #d, 0, __VA_ARGS__); \
-  } while (0);
-#define lol_error3(d, ...)                                    \
-  do {                                                        \
-    static void *lol_name_##d = NULL;                         \
-    if (lol_unlikely(lol_name_##d == NULL)) {                 \
-      lol_name_##d = lol_get(#d);                             \
-    }                                                         \
-    lol_message(LOL_ERROR, lol_name_##d, #d, 0, __VA_ARGS__); \
-  } while (0);
-#define lol_warn3(d, ...)                                    \
-  do {                                                       \
-    static void *lol_name_##d = NULL;                        \
-    if (lol_unlikely(lol_name_##d == NULL)) {                \
-      lol_name_##d = lol_get(#d);                            \
-    }                                                        \
-    lol_message(LOL_WARN, lol_name_##d, #d, 0, __VA_ARGS__); \
-  } while (0);
-#define lol_info3(d, ...)                                    \
-  do {                                                       \
-    static void *lol_name_##d = NULL;                        \
-    if (lol_unlikely(lol_name_##d == NULL)) {                \
-      lol_name_##d = lol_get(#d);                            \
-    }                                                        \
-    lol_message(LOL_INFO, lol_name_##d, #d, 0, __VA_ARGS__); \
-  } while (0);
-#define lol_debug3(d, ...)                                    \
-  do {                                                        \
-    static void *lol_name_##d = NULL;                         \
-    if (lol_unlikely(lol_name_##d == NULL)) {                 \
-      lol_name_##d = lol_get(#d);                             \
-    }                                                         \
-    lol_message(LOL_DEBUG, lol_name_##d, #d, 0, __VA_ARGS__); \
-  } while (0);
-#define lol_trace3(d, ...)                                    \
-  do {                                                        \
-    static void *lol_name_##d = NULL;                         \
-    if (lol_unlikely(lol_name_##d == NULL)) {                 \
-      lol_name_##d = lol_get(#d);                             \
-    }                                                         \
-    lol_message(LOL_TRACE, lol_name_##d, #d, 0, __VA_ARGS__); \
-  } while (0);
+#define lol_fatal3(d, ...)      lol_xxx3(d, LOL_FATAL, __VA_ARGS__)
+#define lol_error3(d, ...)      lol_xxx3(d, LOL_ERROR, __VA_ARGS__)
+#define lol_warn3(d, ...)       lol_xxx3(d, LOL_WARN, __VA_ARGS__)
+#define lol_info3(d, ...)       lol_xxx3(d, LOL_INFO, __VA_ARGS__)
+#define lol_debug3(d, ...)      lol_xxx3(d, LOL_DEBUG, __VA_ARGS__)
+#define lol_trace3(d, ...)      lol_xxx3(d, LOL_TRACE, __VA_ARGS__)
 
 /* lol_xxx_with_errno function family */
 #define lol_fatal_e(e, ...)     lol_message(LOL_FATAL, 0, 0, e, __VA_ARGS__)

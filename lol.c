@@ -9,6 +9,12 @@
 #include <sys/time.h>
 #include <time.h>
 
+#if defined(_MSC_VER)
+  #define lol_inline __inline
+#else
+  #define lol_inline __inline__
+#endif
+
 #define NOR              "\033[0m" /* all off */
 #define FGC_BLACK        "\033[30m" /* Foreground Color: Black */
 #define FGC_RED          "\033[31m" /* Foreground Color: Red */
@@ -53,7 +59,7 @@ static lol_t *lol_list = NULL;
 
 static const char *g_lol_domain = NULL;
 
-static inline FILE *get_default_std_target()
+static lol_inline FILE *get_default_std_target()
 {
     return stderr;
 }
@@ -166,11 +172,11 @@ static char *log_linefeed(char *buf, char *last)
     return lol_slprintf(buf, last, "\n");
 }
 
-static inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
-                                   const char *domain_name, int err,
-                                   const char *file, int line, const char *func,
-                                   int content_only, const char *format,
-                                   va_list ap)
+static lol_inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
+                                       const char *domain_name, int err,
+                                       const char *file, int line,
+                                       const char *func, int content_only,
+                                       const char *format, va_list ap)
 {
     char logstr[LOL_MAX_LEN];
     char *p, *last;
@@ -224,7 +230,7 @@ static void lol_vprintf(lol_level_e level, lol_t *log, const char *domain_name,
         if ((!log->domain || !domain_name) && log->domain != domain_name)
             continue;
 
-perf:
+    perf:
         if (log->std_level >= level && (log->target & LOL_TARGET_STD)) {
             lol_compose_str(log, get_default_std_target(), level, domain_name,
                             err, file, line, func, content_only, format, ap);
@@ -251,8 +257,8 @@ void lol_printf(lol_level_e level, void *log, const char *domain_id, int err,
 
 static pthread_mutex_t lol_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static inline void init_lol(lol_t *log, lol_level_e std_level, const char *file,
-                            lol_level_e file_level)
+static lol_inline void init_lol(lol_t *log, lol_level_e std_level,
+                                const char *file, lol_level_e file_level)
 {
     /* add default writer */
     log->target |= LOL_TARGET_STD;
