@@ -6,25 +6,25 @@
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef BUILDING_DLL
     #ifdef __GNUC__
-      #define DLL_PUBLIC __attribute__((dllexport))
+      #define LOL_PUBLIC __attribute__((dllexport))
     #else
-      #define DLL_PUBLIC __declspec(dllexport)
+      #define LOL_PUBLIC __declspec(dllexport)
     #endif
   #else
     #ifdef __GNUC__
-      #define DLL_PUBLIC __attribute__((dllimport))
+      #define LOL_PUBLIC __attribute__((dllimport))
     #else
-      #define DLL_PUBLIC __declspec(dllimport)
+      #define LOL_PUBLIC __declspec(dllimport)
     #endif
   #endif
-  #define DLL_LOCAL
+  #define LOL_LOCAL
 #else
   #if __GNUC__ >= 4
-    #define DLL_PUBLIC __attribute__((visibility("default")))
-    #define DLL_LOCAL  __attribute__((visibility("hidden")))
+    #define LOL_PUBLIC __attribute__((visibility("default")))
+    #define LOL_LOCAL  __attribute__((visibility("hidden")))
   #else
-    #define DLL_PUBLIC
-    #define DLL_LOCAL
+    #define LOL_PUBLIC
+    #define LOL_LOCAL
   #endif
 #endif
 
@@ -67,7 +67,7 @@ typedef enum {
  *
  * it support multiple calls in multi-thread environment.
  */
-DLL_PUBLIC int lol_init(const char *domain, lol_level_e std_level,
+LOL_PUBLIC int lol_init(const char *domain, lol_level_e std_level,
                         const char *file, lol_level_e file_level);
 /**
  * initialize lol with default settings
@@ -80,19 +80,19 @@ DLL_PUBLIC int lol_init(const char *domain, lol_level_e std_level,
  * it support multiple calls in single thread environment.
  * but thread-unsafe
  */
-DLL_PUBLIC void lol_fini();
+LOL_PUBLIC void lol_fini();
 
-DLL_PUBLIC int lol_add_domain(const char *domain, lol_level_e std_level,
+LOL_PUBLIC int lol_add_domain(const char *domain, lol_level_e std_level,
                               const char *file, lol_level_e file_level);
 
-DLL_PUBLIC lol_level_e lol_string_to_level(const char *level);
+LOL_PUBLIC lol_level_e lol_string_to_level(const char *level);
 
 /**
  * get specific lol_t by domain(for performance)
  */
-DLL_PUBLIC void *lol_get(const char *domain);
+LOL_PUBLIC void *lol_get(const char *domain);
 
-DLL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
+LOL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
                            int err, const char *file, int line,
                            const char *func, int content_only,
                            const char *format, ...);
