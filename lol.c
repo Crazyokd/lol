@@ -346,10 +346,12 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
 
     lol_t *log, *next;
 
+    pthread_mutex_lock(&lol_mutex);
     next = lol_list;
     do {
         if (next->domain && !strcmp(next->domain, domain)) {
             /* do not add same domain */
+            pthread_mutex_unlock(&lol_mutex);
             return -1;
         }
         if (next->next)
@@ -361,6 +363,7 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     /* init log_list */
     log = calloc(1, sizeof(lol_t));
     if (lol_unlikely(!log)) {
+        pthread_mutex_unlock(&lol_mutex);
         return -1;
     }
 
@@ -368,6 +371,7 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     log->domain = malloc(strlen(domain) + 1);
     if (lol_unlikely(!log->domain)) {
         free(log);
+        pthread_mutex_unlock(&lol_mutex);
         return -1;
     }
     strcpy(log->domain, domain);
@@ -379,6 +383,7 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     while (next->next) next = next->next;
     next->next = log;
 
+    pthread_mutex_unlock(&lol_mutex);
     return 0;
 }
 
