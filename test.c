@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <getopt.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -34,7 +33,8 @@ static void test_errno()
     lol_init("errno", LOL_INFO, NULL, LOL_NONE);
     FILE *f = fopen("nonexist", "r");
     // perror("");
-    lol_error_e(errno, "");
+    lol_error_e("");
+    lol_error_e2(errno, "");
     lol_error_de("errno", errno, "");
     if (f) {
         fclose(f);

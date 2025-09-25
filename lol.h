@@ -1,6 +1,7 @@
 #ifndef LOL_H
 #define LOL_H
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
 
@@ -143,16 +144,27 @@ LOL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
 #define lol_debug3(d, ...) lol_xxx3(d, LOL_DEBUG, __VA_ARGS__)
 #define lol_trace3(d, ...) lol_xxx3(d, LOL_TRACE, __VA_ARGS__)
 
+/* lol_xxx with global errno function family */
+#define lol_term_e(...)                             \
+  lol_message(LOL_FATAL, 0, 0, errno, __VA_ARGS__); \
+  exit(1);
+#define lol_fatal_e(...) lol_message(LOL_FATAL, 0, 0, errno, __VA_ARGS__)
+#define lol_error_e(...) lol_message(LOL_ERROR, 0, 0, errno, __VA_ARGS__)
+#define lol_warn_e(...)  lol_message(LOL_WARN, 0, 0, errno, __VA_ARGS__)
+#define lol_info_e(...)  lol_message(LOL_INFO, 0, 0, errno, __VA_ARGS__)
+#define lol_debug_e(...) lol_message(LOL_DEBUG, 0, 0, errno, __VA_ARGS__)
+#define lol_trace_e(...) lol_message(LOL_TRACE, 0, 0, errno, __VA_ARGS__)
+
 /* lol_xxx_with_errno function family */
-#define lol_term_e(e, ...)                      \
+#define lol_term_e2(e, ...)                     \
   lol_message(LOL_FATAL, 0, 0, e, __VA_ARGS__); \
   exit(1);
-#define lol_fatal_e(e, ...) lol_message(LOL_FATAL, 0, 0, e, __VA_ARGS__)
-#define lol_error_e(e, ...) lol_message(LOL_ERROR, 0, 0, e, __VA_ARGS__)
-#define lol_warn_e(e, ...)  lol_message(LOL_WARN, 0, 0, e, __VA_ARGS__)
-#define lol_info_e(e, ...)  lol_message(LOL_INFO, 0, 0, e, __VA_ARGS__)
-#define lol_debug_e(e, ...) lol_message(LOL_DEBUG, 0, 0, e, __VA_ARGS__)
-#define lol_trace_e(e, ...) lol_message(LOL_TRACE, 0, 0, e, __VA_ARGS__)
+#define lol_fatal_e2(e, ...) lol_message(LOL_FATAL, 0, 0, e, __VA_ARGS__)
+#define lol_error_e2(e, ...) lol_message(LOL_ERROR, 0, 0, e, __VA_ARGS__)
+#define lol_warn_e2(e, ...)  lol_message(LOL_WARN, 0, 0, e, __VA_ARGS__)
+#define lol_info_e2(e, ...)  lol_message(LOL_INFO, 0, 0, e, __VA_ARGS__)
+#define lol_debug_e2(e, ...) lol_message(LOL_DEBUG, 0, 0, e, __VA_ARGS__)
+#define lol_trace_e2(e, ...) lol_message(LOL_TRACE, 0, 0, e, __VA_ARGS__)
 
 /* lol_xxx_with_domain_and_errno function family */
 #define lol_term_de(d, e, ...)                  \
