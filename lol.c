@@ -131,7 +131,16 @@ static char *log_timestamp(char *buf, char *last, int use_color)
 
     gettimeofday(&tv, NULL);
     memset(&tm, 0, sizeof(tm));
+
+#ifdef _WIN32
+    // seems timeval.tv_sec is not of type time_t on Windows
+    // see https://en.cppreference.com/w/c/chrono/localtime.html
+    time_t timer = tv.tv_sec;
+    (void)localtime_s(&tm, &timer);
+#else
     (void)localtime_r(&(tv.tv_sec), &tm);
+#endif
+
     strftime(nowstr, sizeof nowstr, "%m/%d %H:%M:%S", &tm);
 
     buf = lol_slprintf(buf, last, "%s%s.%03d%s: ", use_color ? FGC_GREEN : "",
@@ -197,7 +206,13 @@ static lol_inline void lol_compose_str(lol_t *log, FILE *out, lol_level_e level,
 
     if (err) {
         char errbuf[LOL_MAX_LEN >> 6];
+
+#ifdef _WIN32
+        strerror_s(errbuf, LOL_MAX_LEN >> 6, err);
+#else
         strerror_r(err, errbuf, LOL_MAX_LEN >> 6);
+#endif
+
         p = lol_slprintf(p, last, " (%d:%s)", (int)err, errbuf);
     }
 
