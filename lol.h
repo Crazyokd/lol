@@ -6,18 +6,10 @@
 #include <stdlib.h>
 
 #if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL
-    #ifdef __GNUC__
-      #define LOL_PUBLIC __attribute__((dllexport))
-    #else
-      #define LOL_PUBLIC __declspec(dllexport)
-    #endif
+  #ifdef __GNUC__
+    #define LOL_PUBLIC __attribute__((dllexport))
   #else
-    #ifdef __GNUC__
-      #define LOL_PUBLIC __attribute__((dllimport))
-    #else
-      #define LOL_PUBLIC __declspec(dllimport)
-    #endif
+    #define LOL_PUBLIC __declspec(dllexport)
   #endif
   #define LOL_LOCAL
 #else

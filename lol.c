@@ -258,9 +258,10 @@ static void lol_vprintf(lol_level_e level, lol_t *log, const char *domain_name,
     }
 }
 
-void lol_printf(lol_level_e level, void *log, const char *domain_id, int err,
-                const char *file, int line, const char *func, int content_only,
-                const char *format, ...)
+LOL_PUBLIC void lol_printf(lol_level_e level, void *log, const char *domain_id,
+                           int err, const char *file, int line,
+                           const char *func, int content_only,
+                           const char *format, ...)
 {
     va_list args;
 
@@ -298,8 +299,8 @@ static lol_inline void init_lol(lol_t *log, lol_level_e std_level,
     log->print.linefeed = 1;
 }
 
-int lol_init(const char *domain, lol_level_e std_level, const char *file,
-             lol_level_e file_level)
+LOL_PUBLIC int lol_init(const char *domain, lol_level_e std_level,
+                        const char *file, lol_level_e file_level)
 {
     pthread_mutex_lock(&lol_mutex);
     /* the lol only can be initialized once */
@@ -335,7 +336,7 @@ int lol_init(const char *domain, lol_level_e std_level, const char *file,
     return 0;
 }
 
-void lol_fini()
+LOL_PUBLIC void lol_fini()
 {
     if (!lol_list) return;
 
@@ -354,8 +355,8 @@ void lol_fini()
     pthread_mutex_destroy(&lol_mutex);
 }
 
-int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
-                   lol_level_e file_level)
+LOL_PUBLIC int lol_add_domain(const char *domain, lol_level_e std_level,
+                              const char *file, lol_level_e file_level)
 {
     if (lol_unlikely(!lol_list || !domain || !strlen(domain))) return -1;
 
@@ -402,7 +403,7 @@ int lol_add_domain(const char *domain, lol_level_e std_level, const char *file,
     return 0;
 }
 
-lol_level_e lol_string_to_level(const char *level)
+LOL_PUBLIC lol_level_e lol_string_to_level(const char *level)
 {
     if (!level) return LOL_NONE;
 
@@ -425,7 +426,7 @@ lol_level_e lol_string_to_level(const char *level)
     return level_e;
 }
 
-void *lol_get(const char *domain)
+LOL_PUBLIC void *lol_get(const char *domain)
 {
     if (!domain || !strlen(domain)) return NULL;
 
